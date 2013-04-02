@@ -4,22 +4,14 @@ require './markup_receiver'
 def extract(path)
   doc = PDF::Reader.new(path)
   $objects = doc.objects
-  pages_to_notes = {}
+  pages_to_annotations = {}
   doc.pages.each do |page|
     notes = notes_on_page(page)
     markups = markups_on_page(page)
     next unless notes.any? or markups.any?
-
-    puts "# Page #{page.number}"
-    notes.each do |note|
-      puts "  * " + note.contents
-    end
-    markups.each do |markup|
-      puts "  - " + (markup.text || "") + "  (#{markup.created_at} - #{markup.color})" + (markup.contents ? "  \"#{markup.contents}\"" : "")
-    end
-    puts
-    puts
+    pages_to_annotations[page.number] = notes + markups
   end
+  pages_to_annotations
 end
 
 def is_note?(object)
@@ -82,11 +74,15 @@ class Annotation < Struct.new(:attributes)
   end
 
   def contents
-    attributes[:Contents]
+    attributes[:Contents].strip
   end
 end
 
 class Note < Annotation
+
+  def inspect
+    "<Note \"#{contents[0..20]}\">"
+  end
 
 end
 
@@ -126,6 +122,10 @@ class Markup < Annotation
       bottom_left[1] >= bottom && bottom_left[1] <= top
     end
 
+  end
+
+  def inspect
+    "<Markup \"#{(text || "")[0..20]}...\">"
   end
 
   def contains?(x, y)
