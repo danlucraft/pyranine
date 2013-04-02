@@ -8,8 +8,52 @@
 
   body {
     font-family: Helvetica;
+    margin:50px;
   }
+
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .doc {
+    clear: both;
+    margin-bottom: 10px;
+    float: left;
+  }
+
+  .page {
+  }
+
+  .page .page-number {
+    font-size:2em;
+    width: 50px;
+    text-align: right;
+    float: left;
+  }
+
+  .page .annotation {
+    margin-bottom: 10px;
+  }
+
+  .page .annotations {
+    margin-left: 50px;
+    float: left;
+  }
+
+  .page .created-at {
+    color: #999;
+    font-size: 0.8em;
+  }
+
 </style>
+
 <body>
   <script>
     $(document).ready(function() {
@@ -50,19 +94,25 @@
   <ul>
     <% docs.each do |doc| %>
       <li class="doc">
-        <h4><%= doc.filename %></h4>
+        <h4 class="filename"><%= doc.filename %></h4>
         <ul>
-
           <% doc.pages.each do |i, page| %>
             <li>
-              <strong><%= i %></strong><br />
-              <% page.annotations.each do |a| %>
-                <%= a.created_at.strftime("%x") %>
-                <%= a.to_html %>
-              <% end %>
+
+              <div class="page">
+                <div class="page-number"><%= i %></div>
+                <div class="annotations">
+                  <% page.annotations.each do |a| %>
+                    <div class="annotation">
+                      <div class="content"><%= a.to_html %></div>
+                      <div class="created-at"><%= a.created_at.strftime("%x") %></div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+
             </li>
           <% end %>
-
         </ul>
       </li>
     <% end %>
