@@ -28,11 +28,18 @@
     float: left;
   }
 
+  .doc .filename {
+    font-size: 1.5em;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+
   .page {
   }
 
   .page .page-number {
-    font-size:2em;
+    font-size:1.22em;
     width: 50px;
     text-align: right;
     float: left;
@@ -63,7 +70,7 @@
           if (filter === "") {
             $(el).show();
           } else {
-            var filename = $(el).find("h4").text().toLowerCase();
+            var filename = $(el).find(".filename").text().toLowerCase();
             if (filename.indexOf(filter) != -1) {
               $(el).show();
             } else {
@@ -94,7 +101,7 @@
   <ul>
     <% docs.each do |doc| %>
       <li class="doc">
-        <h4 class="filename"><%= doc.filename %></h4>
+        <div class="filename"><%= doc.filename %></div>
         <ul>
           <% doc.pages.each do |i, page| %>
             <li>
