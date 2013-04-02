@@ -1,9 +1,26 @@
 require 'pdf-reader'
 require './markup_receiver'
 
-doc = PDF::Reader.new(ARGV[0])
+def extract(path)
+  doc = PDF::Reader.new(path)
+  $objects = doc.objects
+  pages_to_notes = {}
+  doc.pages.each do |page|
+    notes = notes_on_page(page)
+    markups = markups_on_page(page)
+    next unless notes.any? or markups.any?
 
-$objects = doc.objects
+    puts "# Page #{page.number}"
+    notes.each do |note|
+      puts "  * " + note.contents
+    end
+    markups.each do |markup|
+      puts "  - " + (markup.text || "") + "  (#{markup.created_at} - #{markup.color})" + (markup.contents ? "  \"#{markup.contents}\"" : "")
+    end
+    puts
+    puts
+  end
+end
 
 def is_note?(object)
   object[:Type] == :Annot && [:Text, :FreeText].include?(object[:Subtype])
@@ -31,7 +48,7 @@ end
 
 def notes_on_page(page)
   all_annots = annots_on_page(page)
-  all_annots.select { |a| is_note?(a) }
+  all_annots.select { |a| is_note?(a) }.map {|n| Note.new(n) }
 end
 
 def markups_on_page(page)
@@ -48,13 +65,33 @@ def markups_on_page(page)
 
 end
 
-class Markup
-  attr_reader :attributes
-  attr_accessor :text
+class Annotation < Struct.new(:attributes)
 
-  def initialize(attributes)
-    @attributes = attributes
+  def created_at
+    if s = attributes[:M]
+      DateTime.strptime(s.split("Z").first, "D:%Y%m%d%H%M%S")
+    end
   end
+
+  def color
+    rgb_to_hex(attributes[:C])
+  end
+
+  def rgb_to_hex(rgb)
+    "#" + rgb.map {|i| (i*255).to_i.to_s(16).rjust(2, "0").upcase }.join
+  end
+
+  def contents
+    attributes[:Contents]
+  end
+end
+
+class Note < Annotation
+
+end
+
+class Markup < Annotation
+  attr_accessor :text
 
   class Rectangle
     attr_reader :quad_points
@@ -88,19 +125,9 @@ class Markup
     def within?(bottom, top)
       bottom_left[1] >= bottom && bottom_left[1] <= top
     end
-    
+
   end
 
-  def rectangles
-    attributes[:QuadPoints].each_slice(8).to_a.map do |ps| 
-      Rectangle.new(ps.each_slice(2).to_a)
-    end
-  end
-
-  def color
-    rgb_to_hex(attributes[:C])
-  end
-  
   def contains?(x, y)
     rectangles.any? {|r| r.contains?([x, y]) }
   end
@@ -109,24 +136,9 @@ class Markup
     rectangles.any? {|r| r.within?(bottom, top) }
   end
 
-  def rgb_to_hex(rgb)
-    "#" + rgb.map {|i| (i*255).to_i.to_s(16).rjust(2, "0").upcase }.join
+  def rectangles
+    attributes[:QuadPoints].each_slice(8).to_a.map do |ps|
+      Rectangle.new(ps.each_slice(2).to_a)
+    end
   end
 end
-
-doc.pages.each do |page|
-  notes = notes_on_page(page)
-  markups = markups_on_page(page)
-  next unless notes.any? or markups.any?
-
-  puts "# Page #{page.number}"
-  notes.each do |note|
-    puts "  * " + note[:Contents]
-  end
-  markups.each do |markup|
-    puts "  - " + (markup.text || "")
-  end
-  puts
-  puts
-end
-
