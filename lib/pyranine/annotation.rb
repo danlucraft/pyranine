@@ -31,6 +31,10 @@ module Pyranine
     def empty?
       contents == ""
     end
+
+    def to_html
+      "<span class=note style=\"color: #{color};\">#{ contents }</span>"
+    end
   end
 
   class Markup < Annotation
@@ -91,6 +95,10 @@ module Pyranine
 
     def empty?
       contents == "" and [nil, ""].include?(text) 
+    end
+
+    def to_html
+      "<span class=markup style=\"color: #{color};\">#{ text }</span>"
     end
   end
 

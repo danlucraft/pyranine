@@ -19,13 +19,7 @@
               <strong><%= i %></strong><br />
               <% page.annotations.each do |a| %>
                 <%= a.created_at.strftime("%x") %>
-                <blockquote>
-                  <% if a.is_a?(Note) %>
-                    <%= a.contents %>
-                  <% else %>
-                    <%= a.text %> (<%= a.contents %>)
-                  <% end %>
-                </blockquote>
+                <%= a.to_html %>
               <% end %>
             </li>
           <% end %>
