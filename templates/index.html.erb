@@ -1,4 +1,9 @@
+
 <html>
+  <head>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+  </head>
+
 <style>
 
   body {
@@ -6,12 +11,46 @@
   }
 </style>
 <body>
+  <script>
+    $(document).ready(function() {
+      function updateFilter() {
+        var filter = $('#filter').val().toLowerCase();
+        $('.doc').each(function(ix, el) {
+          if (filter === "") {
+            $(el).show();
+          } else {
+            var filename = $(el).find("h4").text().toLowerCase();
+            if (filename.indexOf(filter) != -1) {
+              $(el).show();
+            } else {
+              $(el).hide();
+            }
+          }
+        });
+      }
+      $('#filter').bind('keypress', function(){
+        setTimeout(updateFilter, 1);
+      });
+      $('#filter').bind('keydown', function(e){
+        if (e.keyCode == 8) {
+          setTimeout(updateFilter, 1);
+        }
+      });
+    });
+  </script>
+
   <h1>Annotation Viewer</h1>
   <p>For <code><%= target_dir %></code></p>
+
+  <p>
+    Filter: 
+    <input id="filter"></input>
+  </p>
+
   <ul>
     <% docs.each do |doc| %>
-      <li>
-        <h3><%= doc.filename %></h3>
+      <li class="doc">
+        <h4><%= doc.filename %></h4>
         <ul>
 
           <% doc.pages.each do |i, page| %>
@@ -28,5 +67,6 @@
       </li>
     <% end %>
   </ul>
+
 </body>
 </html>
