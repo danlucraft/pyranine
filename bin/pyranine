@@ -1,0 +1,5 @@
+$:.push(File.expand_path("../../lib", __FILE__))
+require 'pyranine'
+
+cli = Pyranine::CLI.new(ARGV)
+cli.generate

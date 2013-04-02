@@ -2,9 +2,9 @@
 <body>
   <h1>Annotation Viewer</h1>
   <ul>
-    <% docs.each do |filename, doc| %>
+    <% docs.each do |doc| %>
       <li>
-        <h3><%= filename %></h3>
+        <h3><%= doc.filename %></h3>
         <ul>
 
           <% doc.pages.each do |i, page| %>
