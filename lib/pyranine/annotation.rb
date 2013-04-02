@@ -28,6 +28,9 @@ module Pyranine
       "<Note \"#{contents[0..20]}\">"
     end
 
+    def empty?
+      contents == ""
+    end
   end
 
   class Markup < Annotation
@@ -84,6 +87,10 @@ module Pyranine
       attributes[:QuadPoints].each_slice(8).to_a.map do |ps|
         Rectangle.new(ps.each_slice(2).to_a)
       end
+    end
+
+    def empty?
+      contents == "" and [nil, ""].include?(text) 
     end
   end
 

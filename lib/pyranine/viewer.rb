@@ -1,6 +1,6 @@
 module Pyranine
   class Viewer
-    attr_reader :docs
+    attr_reader :docs, :target_dir
 
     def initialize(target_dir)
       @target_dir = target_dir
