@@ -14,11 +14,16 @@ module Pyranine
     end
 
     def rgb_to_hex(rgb)
-      "#" + rgb.map {|i| (i*255).to_i.to_s(16).rjust(2, "0").upcase }.join
+      if rgb
+        "#" + rgb.map {|i| (i*255).to_i.to_s(16).rjust(2, "0").upcase }.join
+      else
+        "#000000"
+      end
     end
 
     def contents
-      attributes[:Contents].strip
+      c = attributes[:Contents]
+      c ? c.strip : c
     end
   end
 
